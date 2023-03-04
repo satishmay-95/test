@@ -1,0 +1,659 @@
+import arcpy
+import os
+import datetime
+import xlwt
+
+# Set workspace and output folder path
+arcpy.env.workspace = "D:/GIS/$$ FLANCE $$/2.Surankoot/2.Shapefiles/Data model SHP"
+output_folder = "Shapefiles_Dump"
+excel_file = "Shapefiles_Dump.xls"
+
+# Create output folder if it doesn't already exist
+if not os.path.exists(os.path.join(arcpy.env.workspace, output_folder)):
+    os.mkdir(os.path.join(arcpy.env.workspace, output_folder))
+
+# Define shapefile names and data types
+shapefile_list = [("AOI.shp", "POLYGON"),
+                  ("MUN_AREA.shp", "POLYGON"),
+                  ("ZONE.shp", "POLYGON"),
+                  ("WARD.shp", "POLYGON"),
+                  ("GCP.shp", "POLYGON"),
+                  ("ROAD.shp", "POLYLINE"),
+                  ("TS.shp", "POINT"),
+                  ("DRAINAGE.shp", "POLYLINE"),
+                  ("DRAINAGE.shp", "POLYGON"),
+                  ("RAILWAY.shp", "POLYLINE"),
+                  ("RIVER.shp", "POLYGON"),
+                  ("STREET LIGHT.shp", "POINT"),
+                  ("BRIDG.shp", "POLYLINE"),
+                  ("FLYOVER.shp", "POLYLINE"),
+                  ("MOHALLAH.shp", "POLYGON"),
+                  ("SLUM.shp", "POLYGON"),
+                  ("BUILDINGS.shp", "POLYGON"),
+                  ("LANDUSE.shp", "POLYGON"),
+                  ("PARK.shp", "POLYGON"),
+                  ("LANDMARKS.shp", "POINT"),
+                  ("OHT.shp", "POINT"),
+                  ("WRESERV.shp", "POINT"),
+                  ("WPS.shp", "POINT"),
+                  ("WSN.shp", "POINT"),
+                  ("VALVE.shp", "POINT"),
+                  ("SEWNETWORK.shp", "POLYLINE"),
+                  ("MH.shp", "POINT"),
+                  ("SPS.shp", "POINT"),
+                  ("STP.shp", "POINT"),
+                  ("CAMENITIES.shp", "POINT"),
+                  ("RELGSTRUC.shp", "POINT"),
+                  ("LAKE.shp", "POLYGON"),
+                  ("PSN.shp", "POLYLINE"),
+                  ("EP.shp", "POINT"),
+                  ("Transformer.shp", "POINT"),
+                  ("GC.shp", "POINT"),
+                  ("IndZone.shp", "POLYGON"),
+                  ("FRS.shp", "POINT"),
+                  ("SLH.shp", "POINT"),
+                  ("PT.shp", "POINT"),
+                  ("OBI.shp", "POINT"),
+                  ("BS.shp", "POINT"),
+                  ("HDG.shp", "POINT"),
+                  ("CSC.shp", "POINT"),
+                  ("DG.shp", "POINT")]
+
+# Loop through shapefile_list and create shapefiles with specified data types and fields
+for shapefile_name, shapefile_type in shapefile_list:
+    output_shapefile = os.path.join(output_folder, shapefile_name)
+
+    # Check if the output shapefile already exists
+    if os.path.exists(output_shapefile):
+        print("{} already exists. Skipping...".format(output_shapefile))
+        continue
+
+    arcpy.CreateFeatureclass_management(arcpy.env.workspace, output_shapefile, shapefile_type)
+
+        # Add fields with specific lengths to each shapefile
+    if shapefile_name == "AOI.shp":
+        arcpy.AddField_management(output_shapefile, "AOI_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "DIST_CODE", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT" , field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT" , field_length=5)
+        arcpy.AddField_management(output_shapefile, "TN_NAME", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "AOI_AREA", "DOUBLE" , field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "MUN_AREA", "DOUBLE" , field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+	
+
+    elif shapefile_name == "MUN_AREA.shp":
+        arcpy.AddField_management(output_shapefile, "MUN_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "DIST_CODE", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT" , field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT" , field_length=5)
+        arcpy.AddField_management(output_shapefile, "MUN_CODE", "TEXT" , field_length=3)
+        arcpy.AddField_management(output_shapefile, "MUN_NAM", "TEXT" , field_length=8)
+        arcpy.AddField_management(output_shapefile, "T_AR", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "T_POP", "LONG" , field_precision=8, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "T_WARDS", "LONG" , field_precision=3, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "ZONE.shp":
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CITY_CODE", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "Z_AREA", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "Z_NAME", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "Z_WARDS", "LONG" , field_precision=2, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "WARD.shp":
+        arcpy.AddField_management(output_shapefile, "W_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CITY_CODE", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "W_NUM", "TEXT" , field_length=5)
+        arcpy.AddField_management(output_shapefile, "W_AREA", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "W_NAME", "TEXT", field_length=20)
+        arcpy.AddField_management(output_shapefile, "W_POP", "LONG", field_precision=7, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "GCP.shp":
+        arcpy.AddField_management(output_shapefile, "GCP_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CITY_CODE", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CL_CODE", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT" , field_length=3)
+        arcpy.AddField_management(output_shapefile, "W_ID", "TEXT" , field_length=3)
+        arcpy.AddField_management(output_shapefile, "W_NAME", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT" , field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOC_NAME", "TEXT" , field_length=9)
+        arcpy.AddField_management(output_shapefile, "GCP_LAT", "DOUBLE", field_precision=2, field_scale=6)
+        arcpy.AddField_management(output_shapefile, "GCP_LON", "DOUBLE", field_precision=2, field_scale=6)
+        arcpy.AddField_management(output_shapefile, "GCP_HT", "DOUBLE" , field_precision=3, field_scale=3)
+        arcpy.AddField_management(output_shapefile, "FPAT_WD", "DOUBLE" , field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "GCP_PHID", "TEXT" , field_length=15)
+        arcpy.AddField_management(output_shapefile, "SURROUND", "TEXT" , field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "ROAD.shp":
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "RD_NAME", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "RD_TYPE", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "RD_LEN", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "MTD_BY", "TEXT" , field_length=30)
+        arcpy.AddField_management(output_shapefile, "SUR_TYPE", "TEXT" , field_length=255)
+        arcpy.AddField_management(output_shapefile, "CW_WD", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "ROW_WD", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "FPAT_STAT", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "MDN_STAT", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "FPAT_WD", "DOUBLE" , field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "FPA_C_MAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "DRAIN_STAT", "TEXT", field_length=20)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "TS.shp":
+        arcpy.AddField_management(output_shapefile, "TS_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "T_L_ST", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOC_NAME", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "CON_RD", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "TPOST_NO", "TEXT" , field_length=4)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "DRAINAGE.shp":
+        arcpy.AddField_management(output_shapefile, "DRAIN_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "DR_FLOOR", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "CON_MAT", "TEXT" , field_length=15)
+        arcpy.AddField_management(output_shapefile, "DR_DEPTH", "DOUBLE" , field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "CON_TYPE", "TEXT" , field_length=2)
+        arcpy.AddField_management(output_shapefile, "DR_NAME", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "RAILWAY.shp":
+        arcpy.AddField_management(output_shapefile, "RAIL_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "R_L_NAM", "TEXT", field_length=30)
+
+
+    elif shapefile_name == "RIVER.shp":
+        arcpy.AddField_management(output_shapefile, "RIV_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "R_L_NAM", "TEXT", field_length=20)
+
+
+    elif shapefile_name == "STREET LIGHT.shp":
+        arcpy.AddField_management(output_shapefile, "SL_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "LONG" , field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT" , field_length=40)
+        arcpy.AddField_management(output_shapefile, "POL_TYPE", "TEXT" , field_length=10)
+        arcpy.AddField_management(output_shapefile, "SL_TYPE", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "ENG_SRC", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "BRIDG.shp":
+        arcpy.AddField_management(output_shapefile, "BRG_ID", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "BRG_NAM", "DOUBLE" , field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "CONS_MAT", "TEXT" , field_length=10)
+        arcpy.AddField_management(output_shapefile, "COM_YEAR", "DATE" , field_length=8)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "FLYOVER.shp":
+        arcpy.AddField_management(output_shapefile, "FLO_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "FLO_NAM", "TEXT" , field_length=20)
+        arcpy.AddField_management(output_shapefile, "FLO_LTH", "DOUBLE" , field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "FLO_WTH", "DOUBLE" , field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "FLO_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "COM_YEAR", "DATE", field_length=8)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "MOHALLAH.shp":
+        arcpy.AddField_management(output_shapefile, "MOH_ID", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "MOH_NAME", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "MOH_AREA", "DOUBLE", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "SLUM.shp":
+        arcpy.AddField_management(output_shapefile, "SLUM_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "SLM_A_HA", "DOUBLE", field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "LND_STA", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SLM_SUR", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SLM_LOC", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "DRG_STA", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SE_STA", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "WAT_STA", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "FLD_VUL", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "APP_RD_S", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "SL_STAT", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "EDU_FAC", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "HLT_FAC", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "NGT_SHLT", "LONG", field_precision=2, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "BUILDINGS.shp":
+        arcpy.AddField_management(output_shapefile, "BLDG_ID", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "LONG", field_precision=9, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "CONST_TYPE", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "TOT_FLOORS", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "LANDUSE.shp":
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "LU_CODE", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "RD_NAME", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TAX_ZONE", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "PCL_LOC", "TEXT", field_length=40)
+        arcpy.AddField_management(output_shapefile, "LUSE_DET", "TEXT", field_length=40)
+        arcpy.AddField_management(output_shapefile, "PCL_AREA", "DOUBLE", field_precision=8, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "PARK.shp":
+        arcpy.AddField_management(output_shapefile, "PARK_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "PARK_TYPE", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "PARK_NAM", "TEXT", field_length=40)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "LANDMARKS.shp":
+        arcpy.AddField_management(output_shapefile, "LM_ID", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "LM_CODE", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "LM_DESC", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "OHT.shp":
+        arcpy.AddField_management(output_shapefile, "OHT_ID", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WRD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "LONG", field_precision=9, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "T_CAP", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "STAGE_H", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "WRESERV.shp":
+        arcpy.AddField_management(output_shapefile, "RESV_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "LONG", field_precision=9, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "T_CAP", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "RES_SHP", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "RES_AREA", "DOUBLE", field_precision=8, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "WPS.shp":
+        arcpy.AddField_management(output_shapefile, "WPS_ID", "TEXT", field_length=6)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "T_CAP", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "MOT_TYP", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "MOT_CAP", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "RUN_HRS", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "WORK_ST", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "LAT", "DOUBLE", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "WSN.shp":
+        arcpy.AddField_management(output_shapefile, "WSN_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "PIPE_LEN", "DOUBLE", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "PIPE_DIA", "DOUBLE", field_precision=5, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "PIPE_MAT", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "PIP_GRDE", "TEXT", field_precision=2)
+        arcpy.AddField_management(output_shapefile, "PIP_DEP", "LONG", field_precision=2, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "VALVE.shp":
+        arcpy.AddField_management(output_shapefile, "VALVE_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "VAL_TYPE", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "VAL_MAT", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "VAL_SIZE", "DOUBLE", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "SEWNETWORK.shp":
+        arcpy.AddField_management(output_shapefile, "SEWN_ID", "TEXT", field_length=13)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "RD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "PIPE_LEN", "DOUBLE", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "PIPE_DIA", "DOUBLE", field_precision=5, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "PIPE_MAT", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "PIP_DEP", "LONG", field_precision=2, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "SEW_STAT", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "MH.shp":
+        arcpy.AddField_management(output_shapefile, "MH", "TEXT", field_length=7)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "MH_CAT", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "MH_TYPE", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "MH_MAT", "TEXT", field_length=40)
+        arcpy.AddField_management(output_shapefile, "MH_SIZE", "DOUBLE", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "MH_DEPTH", "DOUBLE", field_precision=3, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "MH_STAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "SPS.shp":
+        arcpy.AddField_management(output_shapefile, "SPS_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "T_CAP", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "STP.shp":
+        arcpy.AddField_management(output_shapefile, "STP_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "T_CAP", "DOUBLE", field_precision=2, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "STP_STA", "TEXT", field_length=254)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "LAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "LONG", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "CAMENITIES.shp":
+        arcpy.AddField_management(output_shapefile, "CIVA_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "BLDG_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CIV_A_DET", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "CAPACITY", "LONG", field_precision=2, field_scale=0)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "RELGSTRUC.shp":
+        arcpy.AddField_management(output_shapefile, "RS_ID", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "RS_CODE", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "DEITY", "TEXT", field_length=30)
+        arcpy.AddField_management(output_shapefile, "COM_YR", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "LAKE.shp":
+        arcpy.AddField_management(output_shapefile, "LAKE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "LAKE_NAME", "TEXT", field_length=20)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "LAKE_TYPE", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "PSN.shp":
+        arcpy.AddField_management(output_shapefile, "PSN_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "PSN_TYPE", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "EP.shp":
+        arcpy.AddField_management(output_shapefile, "EP_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "CON_TYPE", "TEXT", field_length=10)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "ET.shp":
+        arcpy.AddField_management(output_shapefile, "TR_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "PSN_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "GC.shp":
+        arcpy.AddField_management(output_shapefile, "GC_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "GC_TYPE", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "GC_STAT", "TEXT", field_length=15)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "IndZone.shp":
+        arcpy.AddField_management(output_shapefile, "I_Z_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "AREA_HA", "TEXT", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "FRS.shp":
+        arcpy.AddField_management(output_shapefile, "FRS_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "AREA_HA", "TEXT", field_precision=4, field_scale=2)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "SLH.shp":
+        arcpy.AddField_management(output_shapefile, "SLH_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "PT.shp":
+        arcpy.AddField_management(output_shapefile, "PT_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "PT_TYPE", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "OBI.shp":
+        arcpy.AddField_management(output_shapefile, "OBI_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "OBI_CODE", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "BS.shp":
+        arcpy.AddField_management(output_shapefile, "BS_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "CP.shp":
+        arcpy.AddField_management(output_shapefile, "CP_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "LOCALITY", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "HDG.shp":
+        arcpy.AddField_management(output_shapefile, "HDG_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "HDG_LOC", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "HDG_CAT", "TEXT", field_length=2)
+        arcpy.AddField_management(output_shapefile, "HDG_SIZE", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "CSC.shp":
+        arcpy.AddField_management(output_shapefile, "CSC_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "CSC_LOC", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
+
+
+    elif shapefile_name == "DG.shp":
+        arcpy.AddField_management(output_shapefile, "DG_ID", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "CLASS", "TEXT", field_length=5)
+        arcpy.AddField_management(output_shapefile, "SUB_CLASS", "TEXT", field_length=8)
+        arcpy.AddField_management(output_shapefile, "ZONE_ID", "TEXT", field_length=3)
+        arcpy.AddField_management(output_shapefile, "WARD_ID", "TEXT", field_length=4)
+        arcpy.AddField_management(output_shapefile, "ROAD_ID", "TEXT", field_length=9)
+        arcpy.AddField_management(output_shapefile, "DG_LOC", "TEXT", field_length=60)
+        arcpy.AddField_management(output_shapefile, "PCL_ID", "TEXT", field_length=12)
+        arcpy.AddField_management(output_shapefile, "TIME_ST", "DATE")
